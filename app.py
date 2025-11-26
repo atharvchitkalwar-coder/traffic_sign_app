@@ -25,7 +25,7 @@ body {
     color: #ffffff !important;
     text-align: center;
     text-shadow: 0px 0px 12px rgba(255,255,255,0.35);
-    margin-top: 25px;
+    margin-top: 25px;   /* 🚀 Added Space */
     margin-bottom: 5px;
 }
 .subtitle {
@@ -50,6 +50,7 @@ body {
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 # ───────────────────────────────────────── LOAD MODEL ───────────────────────────────────────── #
 @st.cache_resource
@@ -110,10 +111,10 @@ class_names = {
 st.sidebar.title("⚙️ Model Details")
 st.sidebar.markdown("#### CNN Model for Traffic Sign Classification")
 st.sidebar.markdown("""
-- 📁 Dataset: German Traffic Signs  
-- 🧠 Classes: **43**  
-- 🔹 Input: **32×32 RGB**  
-- 🧮 Normalization applied  
+-  Dataset: German Traffic Signs  
+-  Classes: **43**  
+-  Input: **32×32 RGB**  
+-  Normalization applied  
 """)
 st.sidebar.info("Upload a traffic sign image to classify it!")
 
@@ -162,5 +163,6 @@ st.markdown(
     "<center>🔬 Powered by <b>TensorFlow</b> + <b>Streamlit</b> 🚀 | ",
     unsafe_allow_html=True
 )
+
 
 
