@@ -1,4 +1,4 @@
-# app.py — Road Edge Theme (R1: Full Wide Road)
+# app.py — Road Edge Theme (R2: Image Background with Overlay Title)
 import streamlit as st
 import tensorflow as tf
 import numpy as np
@@ -24,23 +24,76 @@ st.markdown(
     /* Load a condensed, bold font for headings */
     @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700;400&display=swap');
 
-    /* Page background: NEW ROAD/NIGHT IMAGE */
+    /* Page background: Dark asphalt texture for the main app body */
     .stApp {
-        /* Aesthetic dark road image URL */
-        background-image: url('https://images.unsplash.com/photo-1549429158-450f1465d6c8?fit=crop&w=2000&q=80&v=3'); 
-        background-size: cover;
-        background-position: center; /* Ensure the most interesting part of the image is centered */
-        background-attachment: fixed; /* Keeps image fixed during scroll */
-        
-        /* Dark overlay using background-color and blend-mode for better text legibility */
-        background-blend-mode: multiply;
-        background-color: rgba(10, 10, 15, 0.85); /* Slightly darker overlay */
-        
+        background:
+            radial-gradient(circle at 10% 10%, rgba(255,255,255,0.01), transparent 10%),
+            linear-gradient(180deg, #0b0d0f 0%, #0e1113 100%);
         color: #e6eef8;
         font-family: "Roboto Condensed", sans-serif;
     }
 
-    /* Create a centered road strip container */
+    /* Hero section with the custom background image and overlaid title */
+    .hero-container {
+        position: relative; /* Essential for positioning child elements */
+        width: 100%;
+        max-width: 1200px; /* Limit max width for better appearance */
+        margin: 20px auto; /* Center the hero container */
+        border-radius: 14px;
+        overflow: hidden; /* Ensures image and title stay within bounds */
+        box-shadow: 0 8px 40px rgba(2,6,10,0.7), inset 0 2px 0 rgba(255,255,255,0.015);
+        min-height: 380px; /* Ensure sufficient height for the image */
+        display: flex;
+        align-items: center; /* Vertically center content */
+        justify-content: center; /* Horizontally center content */
+    }
+
+    .hero-background-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('https://i.ibb.co/L5Qp80r/speed-limit-100.jpg'); /* Your uploaded image */
+        background-size: cover;
+        background-position: center bottom; /* Adjust to show more of the road/sign */
+        filter: brightness(0.7); /* Slightly dim the image for text contrast */
+        z-index: 1; /* Ensure image is behind the text */
+    }
+
+    /* Title styling for the overlaid text */
+    .hero-overlay-title {
+        position: relative; /* Position relative to hero-container */
+        z-index: 2; /* Ensure text is above the image */
+        text-align: center;
+        padding-top: 18px;
+        padding-bottom: 6px;
+        color: #fff;
+        font-family: "Roboto Condensed", sans-serif;
+        letter-spacing: 2px;
+        font-size: 52px; /* Larger font size */
+        font-weight: 700;
+        text-shadow:
+            0 0 10px rgba(255,255,255,0.3),
+            0 0 20px rgba(255, 200, 60, 0.2),
+            0 8px 30px rgba(0,0,0,0.8);
+        /* Position to the left, where the vacant sky space is */
+        margin-right: 35%; /* Push text to the left side */
+        margin-top: -10%; /* Adjust vertical position */
+    }
+
+    /* Description paragraph under the title */
+    .hero-description {
+        position: relative;
+        z-index: 2;
+        margin-top: 6px;
+        color: #bfc8d9;
+        font-size: 18px;
+        text-align: center;
+        margin-right: 35%; /* Match title positioning */
+    }
+
+    /* Road container (used for cards, etc., not the main background) */
     .road-wrap {
         width: 100%;
         display: flex;
@@ -49,7 +102,7 @@ st.markdown(
         margin-bottom: 20px;
     }
     .road {
-        width: 80%;                     /* wide road in center */
+        width: 80%;
         min-height: 320px;
         background:
             linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 15%),
@@ -96,29 +149,6 @@ st.markdown(
         opacity: 0.28;
         transform: translateX(0);
         pointer-events: none;
-    }
-
-    /* Title styling -- neon glow effect */
-    .hero {
-        text-align: center;
-        padding-top: 18px;
-        padding-bottom: 6px;
-    }
-    .hero h1 {
-        font-family: "Roboto Condensed", sans-serif;
-        color: #fff;
-        letter-spacing: 1px;
-        font-size: 42px;
-        margin: 0;
-        text-shadow:
-            0 0 8px rgba(255,255,255,0.06),
-            0 0 18px rgba(255, 200, 60, 0.06),
-            0 6px 24px rgba(0,0,0,0.6);
-    }
-    .hero p {
-        margin-top: 6px;
-        color: #bfc8d9;
-        font-size: 16px;
     }
 
     /* Card (glass) for uploader & results */
@@ -196,7 +226,9 @@ st.markdown(
 
     /* Small screens */
     @media (max-width: 900px) {
-        .hero h1 { font-size: 28px; }
+        .hero-overlay-title { font-size: 36px; margin-right: 0; margin-top: 0; }
+        .hero-description { margin-right: 0; }
+        .hero-container { min-height: 250px; }
         .road { width: 94%; }
     }
     </style>
@@ -251,17 +283,14 @@ st.sidebar.markdown(
 st.sidebar.caption("Tip: Use clear centered images (sign fills most of frame) for best results.")
 
 # -------------------------
-# Hero (road banner area)
+# Hero (custom background image area with overlaid title)
 # -------------------------
 st.markdown(
     """
-    <div class="road-wrap">
-      <div class="road card">
-        <div class="hero">
-          <h1>🚦 Traffic Sign Recognition — Road Edge</h1>
-          <p>Real-time sign classification with a road-style interface</p>
-        </div>
-      </div>
+    <div class="hero-container">
+      <div class="hero-background-image"></div>
+      <h1 class="hero-overlay-title">Traffic Sign Detection</h1>
+      <p class="hero-description">Real-time sign classification with a road-style interface</p>
     </div>
     """,
     unsafe_allow_html=True,
