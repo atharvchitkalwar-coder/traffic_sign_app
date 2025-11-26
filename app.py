@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # -------------------------
-# CSS / Theme (Asphalt + Road + Font)
+# CSS / Theme (Road Image Background + Dark Theme)
 # -------------------------
 st.markdown(
     """
@@ -26,14 +26,15 @@ st.markdown(
 
     /* Page background: NEW ROAD/NIGHT IMAGE */
     .stApp {
-        /* Placeholder image URL (replace with your desired image URL) */
-        background-image: url('https://images.unsplash.com/photo-1549429158-450f1465d6c8?fit=crop&w=2000&q=80'); 
+        /* Aesthetic dark road image URL */
+        background-image: url('https://images.unsplash.com/photo-1549429158-450f1465d6c8?fit=crop&w=2000&q=80&v=3'); 
         background-size: cover;
+        background-position: center; /* Ensure the most interesting part of the image is centered */
         background-attachment: fixed; /* Keeps image fixed during scroll */
-        background-color: #0b0d0f; /* Fallback color */
-        /* Dark overlay for better text readability */
+        
+        /* Dark overlay using background-color and blend-mode for better text legibility */
         background-blend-mode: multiply;
-        background-color: rgba(10, 10, 15, 0.75); 
+        background-color: rgba(10, 10, 15, 0.85); /* Slightly darker overlay */
         
         color: #e6eef8;
         font-family: "Roboto Condensed", sans-serif;
