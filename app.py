@@ -153,7 +153,8 @@ else:
 st.markdown("""
 <hr>
 <div style='text-align:center; color: #777;'>
-Made by Atharv Chitkalwar ✨ <br>
+
 Using TensorFlow + Streamlit 🚀
 </div>
 """, unsafe_allow_html=True)
+
