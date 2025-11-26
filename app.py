@@ -1,4 +1,4 @@
-# app.py — Road Edge Theme (R2: Image Background with Overlay Title)
+# app.py — Road Edge Theme (R3: Integrated Image Background FIX)
 import streamlit as st
 import tensorflow as tf
 import numpy as np
@@ -44,8 +44,9 @@ st.markdown(
         box-shadow: 0 8px 40px rgba(2,6,10,0.7), inset 0 2px 0 rgba(255,255,255,0.015);
         min-height: 380px; /* Ensure sufficient height for the image */
         display: flex;
-        align-items: center; /* Vertically center content */
-        justify-content: center; /* Horizontally center content */
+        flex-direction: column; /* Allows vertical alignment */
+        align-items: flex-start; /* Align content to the left side */
+        justify-content: flex-start; /* Align content to the top */
     }
 
     .hero-background-image {
@@ -54,32 +55,37 @@ st.markdown(
         left: 0;
         width: 100%;
         height: 100%;
-        background-image: url('https://i.ibb.co/L5Qp80r/speed-limit-100.jpg'); /* Your uploaded image */
+        /* *** FIX: Updated Image URL (Use a highly reliable image link) ***
+        This image is a similar high-res image of a road and signs.
+        If this fails, you must replace the URL with a link to your image 
+        hosted on a service like Imgur or a public cloud storage.
+        */
+        background-image: url('https://images.unsplash.com/photo-1517743451528-7c85848c2c78?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80'); 
         background-size: cover;
-        background-position: center bottom; /* Adjust to show more of the road/sign */
-        filter: brightness(0.7); /* Slightly dim the image for text contrast */
-        z-index: 1; /* Ensure image is behind the text */
+        background-position: center bottom; /* Keep road visible */
+        filter: brightness(0.65); /* Darker dimming for better contrast */
+        z-index: 1; 
     }
 
     /* Title styling for the overlaid text */
     .hero-overlay-title {
-        position: relative; /* Position relative to hero-container */
-        z-index: 2; /* Ensure text is above the image */
-        text-align: center;
-        padding-top: 18px;
-        padding-bottom: 6px;
+        position: relative;
+        z-index: 2; 
         color: #fff;
         font-family: "Roboto Condensed", sans-serif;
         letter-spacing: 2px;
-        font-size: 52px; /* Larger font size */
+        font-size: 52px;
         font-weight: 700;
         text-shadow:
             0 0 10px rgba(255,255,255,0.3),
             0 0 20px rgba(255, 200, 60, 0.2),
             0 8px 30px rgba(0,0,0,0.8);
-        /* Position to the left, where the vacant sky space is */
-        margin-right: 35%; /* Push text to the left side */
-        margin-top: -10%; /* Adjust vertical position */
+        
+        /* Positioning: move into the vacant sky area */
+        margin-left: 5%; /* Start slightly in from the left edge */
+        margin-top: 50px; /* Push down from the top edge */
+        width: 45%; /* Constrain width to the left vacant space */
+        text-align: left;
     }
 
     /* Description paragraph under the title */
@@ -89,8 +95,9 @@ st.markdown(
         margin-top: 6px;
         color: #bfc8d9;
         font-size: 18px;
-        text-align: center;
-        margin-right: 35%; /* Match title positioning */
+        margin-left: 5%; /* Match title positioning */
+        width: 45%;
+        text-align: left;
     }
 
     /* Road container (used for cards, etc., not the main background) */
@@ -226,8 +233,8 @@ st.markdown(
 
     /* Small screens */
     @media (max-width: 900px) {
-        .hero-overlay-title { font-size: 36px; margin-right: 0; margin-top: 0; }
-        .hero-description { margin-right: 0; }
+        .hero-overlay-title { font-size: 36px; margin-left: 5%; width: 90%; text-align: center; }
+        .hero-description { margin-left: 5%; width: 90%; text-align: center; }
         .hero-container { min-height: 250px; }
         .road { width: 94%; }
     }
