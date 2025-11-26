@@ -1,4 +1,4 @@
-# app.py — Road Edge Theme (R3: Integrated Image Background FIX)
+# app.py — Road Edge Theme (R6: Final Image Path Update - Root Directory)
 import streamlit as st
 import tensorflow as tf
 import numpy as np
@@ -55,12 +55,9 @@ st.markdown(
         left: 0;
         width: 100%;
         height: 100%;
-        /* *** FIX: Updated Image URL (Use a highly reliable image link) ***
-        This image is a similar high-res image of a road and signs.
-        If this fails, you must replace the URL with a link to your image 
-        hosted on a service like Imgur or a public cloud storage.
-        */
-        background-image: url('https://images.unsplash.com/photo-1517743451528-7c85848c2c78?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80'); 
+        /* *** FINAL IMAGE PATH FIX: Referencing image in the root directory *** */
+        /* IMPORTANT: Ensure 'traffic_sign.jpg' is directly next to 'app.py' */
+        background-image: url('./traffic_sign.jpg'); 
         background-size: cover;
         background-position: center bottom; /* Keep road visible */
         filter: brightness(0.65); /* Darker dimming for better contrast */
