@@ -24,11 +24,17 @@ st.markdown(
     /* Load a condensed, bold font for headings */
     @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700;400&display=swap');
 
-    /* Page background: asphalt texture (simulated with gradients) */
+    /* Page background: NEW ROAD/NIGHT IMAGE */
     .stApp {
-        background: 
-          radial-gradient(circle at 10% 10%, rgba(255,255,255,0.01), transparent 10%),
-          linear-gradient(180deg, #0b0d0f 0%, #0e1113 100%);
+        /* Placeholder image URL (replace with your desired image URL) */
+        background-image: url('https://images.unsplash.com/photo-1549429158-450f1465d6c8?fit=crop&w=2000&q=80'); 
+        background-size: cover;
+        background-attachment: fixed; /* Keeps image fixed during scroll */
+        background-color: #0b0d0f; /* Fallback color */
+        /* Dark overlay for better text readability */
+        background-blend-mode: multiply;
+        background-color: rgba(10, 10, 15, 0.75); 
+        
         color: #e6eef8;
         font-family: "Roboto Condensed", sans-serif;
     }
@@ -42,7 +48,7 @@ st.markdown(
         margin-bottom: 20px;
     }
     .road {
-        width: 80%;                 /* wide road in center */
+        width: 80%;                     /* wide road in center */
         min-height: 320px;
         background:
             linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 15%),
@@ -202,6 +208,7 @@ st.markdown(
 # -------------------------
 @st.cache_resource
 def load_tf_model():
+    # Ensure 'model.h5' is in the same directory as this script
     return tf.keras.models.load_model("model.h5")
 
 model = load_tf_model()
@@ -234,8 +241,7 @@ st.sidebar.image("https://raw.githubusercontent.com/streamlit/brand/master/strea
 st.sidebar.title("Model Details")
 st.sidebar.markdown(
     """
-    **CNN Model**  
-    - Dataset: German Traffic Signs (GTSRB)  
+    **CNN Model** - Dataset: German Traffic Signs (GTSRB)  
     - Input: 32×32 RGB  
     - Classes: 43  
     - Norm: pixel/255.0  
