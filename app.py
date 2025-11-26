@@ -1,64 +1,214 @@
+# app.py — Road Edge Theme (R1: Full Wide Road)
 import streamlit as st
 import tensorflow as tf
 import numpy as np
 from PIL import Image
+import pandas as pd
 
-# PAGE CONFIG
+# -------------------------
+# Page config
+# -------------------------
 st.set_page_config(
-    page_title="Traffic Sign Recognition",
+    page_title="Traffic Sign Recognition — Road Edge Theme",
     page_icon="🚦",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded",
 )
 
-# CUSTOM CSS
-st.markdown("""
-<style>
-body {
-    background-color: #0d1117;
-}
-.block-container {
-    padding-top: 6rem !important; /* FIXED TOP SPACING 🚀 */
-}
-.title {
-    font-size: 3rem;
-    font-weight: 900;
-    color: #ffffff !important;
-    text-align: center;
-    text-shadow: 0px 0px 12px rgba(255,255,255,0.35);
-    margin-top: 10px !important;
-    margin-bottom: 5px;
-}
-.subtitle {
-    font-size: 1.2rem;
-    color: #c9c9c9 !important;
-    text-align: center;
-    margin-bottom: 35px;
-}
-.result-box {
-    background: #1f2937;
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-    border-left: 5px solid #00c853;
-}
-.upload-note {
-    background: #3b3f04;
-    padding: 10px;
-    border-radius: 10px;
-    text-align: center;
-    color: #e5e5e5;
-}
-</style>
-""", unsafe_allow_html=True)
+# -------------------------
+# CSS / Theme (Asphalt + Road + Font)
+# -------------------------
+st.markdown(
+    """
+    <style>
+    /* Load a condensed, bold font for headings */
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700;400&display=swap');
 
-# LOAD MODEL
+    /* Page background: asphalt texture (simulated with gradients) */
+    .stApp {
+        background: 
+          radial-gradient(circle at 10% 10%, rgba(255,255,255,0.01), transparent 10%),
+          linear-gradient(180deg, #0b0d0f 0%, #0e1113 100%);
+        color: #e6eef8;
+        font-family: "Roboto Condensed", sans-serif;
+    }
+
+    /* Create a centered road strip container */
+    .road-wrap {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
+    .road {
+        width: 80%;                 /* wide road in center */
+        min-height: 320px;
+        background:
+            linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 15%),
+            repeating-linear-gradient(180deg, #1b1d1f 0px, #1b1d1f 8px, #17181a 8px, #17181a 16px),
+            linear-gradient(180deg, rgba(0,0,0,0.2), rgba(0,0,0,0.35));
+        border-radius: 14px;
+        box-shadow: 0 8px 40px rgba(2,6,10,0.7), inset 0 2px 0 rgba(255,255,255,0.015);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* yellow center divider */
+    .road::before{
+        content: "";
+        position: absolute;
+        left: 48%;
+        width: 4%;
+        top: 0;
+        height: 100%;
+        background: repeating-linear-gradient(
+            to bottom,
+            #f2c94c 0px,
+            #f2c94c 14px,
+            rgba(0,0,0,0) 14px,
+            rgba(0,0,0,0) 28px
+        );
+        box-shadow: 0 0 20px rgba(242,201,76,0.06);
+        transform: translateX(-50%);
+    }
+
+    /* dashed white lane markings on both sides */
+    .road::after{
+        content: "";
+        position: absolute;
+        left: 22px;
+        right: 22px;
+        top: 0;
+        height: 100%;
+        background:
+          linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0));
+        background-image:
+          repeating-linear-gradient(180deg, rgba(255,255,255,0.15) 0px, rgba(255,255,255,0.15) 6px, rgba(255,255,255,0) 6px, rgba(255,255,255,0) 24px);
+        mask: linear-gradient(#000 0 0); /* ensure consistent dash opacity */
+        opacity: 0.28;
+        transform: translateX(0);
+        pointer-events: none;
+    }
+
+    /* Title styling -- neon glow effect */
+    .hero {
+        text-align: center;
+        padding-top: 18px;
+        padding-bottom: 6px;
+    }
+    .hero h1 {
+        font-family: "Roboto Condensed", sans-serif;
+        color: #fff;
+        letter-spacing: 1px;
+        font-size: 42px;
+        margin: 0;
+        text-shadow:
+            0 0 8px rgba(255,255,255,0.06),
+            0 0 18px rgba(255, 200, 60, 0.06),
+            0 6px 24px rgba(0,0,0,0.6);
+    }
+    .hero p {
+        margin-top: 6px;
+        color: #bfc8d9;
+        font-size: 16px;
+    }
+
+    /* Card (glass) for uploader & results */
+    .card {
+        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 8px 30px rgba(1,6,10,0.6);
+        border: 1px solid rgba(255,255,255,0.03);
+    }
+
+    /* Prediction result box (accent) */
+    .result {
+        background: linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.4));
+        border-left: 6px solid rgba(242,201,76,0.95);
+        padding: 14px;
+        border-radius: 10px;
+        color: #fff;
+    }
+
+    /* Confidence bar container */
+    .conf-bar {
+        height: 14px;
+        background: rgba(255,255,255,0.06);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .conf-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #00c853, #f2c94c, #ff5252);
+        transition: width 800ms ease;
+    }
+
+    /* Top5 list */
+    .top5 {
+        margin-top: 10px;
+    }
+    .top5 .row {
+        display:flex;
+        align-items:center;
+        gap:10px;
+        margin-bottom:8px;
+    }
+    .top5 .label {
+        min-width: 32%;
+        color: #e6eef8;
+        font-size: 14px;
+    }
+    .top5 .bar {
+        height:10px;
+        border-radius:6px;
+        background: rgba(255,255,255,0.06);
+        width: 60%;
+        overflow:hidden;
+    }
+    .top5 .bar > i {
+        display:block;
+        height:100%;
+        background: linear-gradient(90deg,#00e676,#ffea00,#ff3d00);
+    }
+
+    /* Footer */
+    .footer {
+        text-align:center;
+        color:#9fb0c9;
+        padding-top:18px;
+        padding-bottom:30px;
+        font-size:14px;
+    }
+
+    /* Make uploader full width inside card */
+    .uploader > div {
+        width:100% !important;
+    }
+
+    /* Small screens */
+    @media (max-width: 900px) {
+        .hero h1 { font-size: 28px; }
+        .road { width: 94%; }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# -------------------------
+# Load model with caching
+# -------------------------
 @st.cache_resource
-def load_model():
+def load_tf_model():
     return tf.keras.models.load_model("model.h5")
 
-model = load_model()
+model = load_tf_model()
 
-# CLASS LABELS
+# -------------------------
+# Class names (same as training)
+# -------------------------
 class_names = {
     0: 'Speed limit (20km/h)', 1: 'Speed limit (30km/h)', 2: 'Speed limit (50km/h)',
     3: 'Speed limit (60km/h)', 4: 'Speed limit (70km/h)', 5: 'Speed limit (80km/h)',
@@ -77,52 +227,139 @@ class_names = {
     40: 'Roundabout', 41: 'End no passing', 42: 'End no passing >3.5t'
 }
 
-# SIDEBAR INFO
-st.sidebar.title("⚙️ Model Details")
-st.sidebar.markdown("#### CNN Model for Traffic Sign Recognition")
-st.sidebar.markdown("""
-- 📁 Dataset: German Traffic Signs  
-- 🧠 Classes: **43**  
-- 🔹 Input: **32×32 RGB**  
-- 🧮 Normalization applied  
-""")
+# -------------------------
+# Sidebar
+# -------------------------
+st.sidebar.image("https://raw.githubusercontent.com/streamlit/brand/master/streamlit-mark-light.png", width=120)
+st.sidebar.title("Model Details")
+st.sidebar.markdown(
+    """
+    **CNN Model**  
+    - Dataset: German Traffic Signs (GTSRB)  
+    - Input: 32×32 RGB  
+    - Classes: 43  
+    - Norm: pixel/255.0  
+    """
+)
+st.sidebar.caption("Tip: Use clear centered images (sign fills most of frame) for best results.")
 
-# MAIN HEADINGS
-st.markdown('<p class="title">🚦 Traffic Sign Recognition System</p>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">AI-powered real-time road sign classification</p>', unsafe_allow_html=True)
-
-# UPLOAD
-uploaded_file = st.file_uploader("📌 Upload Traffic Sign Image", type=["jpg", "jpeg", "png"])
-
-# PREDICTION
-if uploaded_file:
-    image = Image.open(uploaded_file)
-    st.image(image, caption="📷 Uploaded Image", width=350)
-
-    with st.spinner("🔍 Detecting sign..."):
-        img = np.expand_dims(np.array(image.resize((32,32)).convert("RGB"))/255.0, axis=0)
-        predictions = model.predict(img)
-        top_5 = predictions[0].argsort()[-5:][::-1]
-        pred_idx = top_5[0]
-
-    st.markdown(
-        f"<div class='result-box'><h4>Prediction: {class_names[pred_idx]}</h4>"
-        f"<p>Confidence: <b>{predictions[0][pred_idx]*100:.2f}%</b></p></div>",
-        unsafe_allow_html=True
-    )
-
-    st.bar_chart({"Confidence": [float(predictions[0][i]) for i in top_5]},
-                 x=[class_names[i] for i in top_5])
-
-else:
-    st.markdown('<p class="upload-note">⬆ Upload an image to start classification</p>',
-                unsafe_allow_html=True)
-
-# FOOTER
-st.write("---")
+# -------------------------
+# Hero (road banner area)
+# -------------------------
 st.markdown(
-    "<center>🔬 Powered by <b>TensorFlow</b> + <b>Streamlit</b> 🚀  </center>",
-    unsafe_allow_html=True
+    """
+    <div class="road-wrap">
+      <div class="road card">
+        <div class="hero">
+          <h1>🚦 Traffic Sign Recognition — Road Edge</h1>
+          <p>Real-time sign classification with a road-style interface</p>
+        </div>
+      </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
 )
 
+# -------------------------
+# Main content area: left uploader / right results
+# -------------------------
+left_col, right_col = st.columns([1, 1.2], gap="large")
 
+with left_col:
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.markdown("### 📤 Upload an image")
+    uploader = st.file_uploader("", type=["jpg", "jpeg", "png"], key="uploader")
+    st.markdown(
+        "<div style='margin-top:8px; color:#c7d2e6'>Supported: JPG, PNG — try clear sign images</div>",
+        unsafe_allow_html=True,
+    )
+    st.markdown("</div>", unsafe_allow_html=True)
+
+with right_col:
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.markdown("### 📈 Prediction")
+    placeholder = st.empty()  # where dynamic content will appear
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# -------------------------
+# Prediction flow
+# -------------------------
+if uploader is not None:
+    # show preview in left column (re-use left_col to update UI)
+    img = Image.open(uploader).convert("RGB")
+    # display preview inside left card
+    with left_col:
+        st.image(img, caption="Uploaded image preview", use_column_width=True)
+
+    # preprocess input
+    x = img.resize((32, 32))
+    arr = np.array(x, dtype=np.float32) / 255.0
+    arr = np.expand_dims(arr, axis=0)
+
+    # run model with spinner
+    with st.spinner("🔎 Running model inference..."):
+        preds = model.predict(arr)[0]
+        idx_sorted = preds.argsort()[::-1]
+        top5 = idx_sorted[:5]
+        # main prediction
+        main_idx = top5[0]
+        main_label = class_names[int(main_idx)]
+        main_conf = float(preds[main_idx])
+
+    # fill right column placeholder with result card
+    with right_col:
+        # result HTML block
+        conf_percent = main_conf * 100
+        bar_width = f"{conf_percent:.2f}%"
+        # top5 bars data
+        top5_labels = [class_names[int(i)] for i in top5]
+        top5_scores = [float(preds[int(i)]) for i in top5]
+        # result markup
+        result_html = f"""
+        <div class="result" style="margin-bottom:12px;">
+          <h3 style="margin:6px 0 4px 0;">✅ {main_label}</h3>
+          <div style="color:#cbd8ea; font-size:14px; margin-bottom:8px;">
+            Confidence: <strong style="color:#fff">{conf_percent:.2f}%</strong>
+          </div>
+          <div class="conf-bar" aria-hidden="true">
+            <div class="conf-fill" style="width:{bar_width};"></div>
+          </div>
+        </div>
+        """
+        placeholder.markdown(result_html, unsafe_allow_html=True)
+
+        # show Top-5 with bars
+        rows_html = "<div class='top5'>"
+        for label, score in zip(top5_labels, top5_scores):
+            width_pct = int(score * 100)
+            # ensure small visible width for tiny scores
+            bar_html = f"<div class='row'><div class='label'>{label}</div>"
+            bar_html += "<div class='bar'><i style='width:" + str(width_pct) + "%'></i></div>"
+            bar_html += f"<div style='min-width:60px; text-align:right; color:#cbd8ea; margin-left:8px;'>{score*100:.1f}%</div></div>"
+            rows_html += bar_html
+        rows_html += "</div>"
+        placeholder.markdown(rows_html, unsafe_allow_html=True)
+
+        # numeric table (optional)
+        df = pd.DataFrame({
+            "label": [class_names[int(i)] for i in top5],
+            "score": [float(preds[int(i)]) for i in top5]
+        })
+        st.markdown("<div style='margin-top:12px;'><small style='color:#9fb0c9'>Top-5 numeric (for debugging)</small></div>", unsafe_allow_html=True)
+        st.table(df.style.format({"score": "{:.4f}"}))
+
+else:
+    # show guidance when no image
+    with left_col:
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.markdown("### Demo Tips")
+        st.markdown("- Use clear photos with the sign centered\n- Avoid heavy motion blur\n- Prefer square-ish crops\n")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with right_col:
+        st.info("Upload an image to get predictions. Try the sample traffic signs for best results.")
+
+# -------------------------
+# Footer
+# -------------------------
+st.markdown("<div class='footer'>🚦 Built with TensorFlow & Streamlit — Developed by Atharv</div>", unsafe_allow_html=True)
