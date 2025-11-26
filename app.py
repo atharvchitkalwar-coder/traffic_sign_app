@@ -1,4 +1,4 @@
-# app.py — Road Edge Theme (R6: Final Image Path Update - Root Directory)
+# app.py — Road Edge Theme (R7: Final Confirmed Image Path - Root Directory)
 import streamlit as st
 import tensorflow as tf
 import numpy as np
@@ -55,8 +55,8 @@ st.markdown(
         left: 0;
         width: 100%;
         height: 100%;
-        /* *** FINAL IMAGE PATH FIX: Referencing image in the root directory *** */
-        /* IMPORTANT: Ensure 'traffic_sign.jpg' is directly next to 'app.py' */
+        /* *** IMAGE PATH: Referencing image in the root directory *** */
+        /* IMPORTANT: Check your file name and extension if this fails! (e.g., traffic_sign.png) */
         background-image: url('./traffic_sign.jpg'); 
         background-size: cover;
         background-position: center bottom; /* Keep road visible */
