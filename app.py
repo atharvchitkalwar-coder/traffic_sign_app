@@ -226,4 +226,5 @@ else:
 # ------------------------- #
 # FOOTER
 # ------------------------- #
-st.markdown("<div class='footer'>🚀 Powered by TensorFlow + Streamlit | Developed by Atharv</div>", unsafe_allow_html=True)
+st.markdown("<div class='footer'>🚀 Powered by TensorFlow + Streamlit </div>", unsafe_allow_html=True)
+
