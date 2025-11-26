@@ -161,7 +161,7 @@ st.markdown(
     <div class="hero">
         <div class="hero-bg"></div>
         <h1 class="hero-title">Traffic Sign Detection</h1>
-        <p class="hero-sub">Real-time AI recognition for road safety</p>
+        <p class="hero-sub">Real-time recognition for road safety</p>
     </div>
     """,
     unsafe_allow_html=True
@@ -227,4 +227,5 @@ else:
 # FOOTER
 # ------------------------- #
 st.markdown("<div class='footer'>🚀 Powered by TensorFlow + Streamlit </div>", unsafe_allow_html=True)
+
 
