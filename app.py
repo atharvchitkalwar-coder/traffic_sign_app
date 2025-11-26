@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 
 # ───────────────────────────────────────── UI INITIAL SETUP ───────────────────────────────────────── #
-st.set_page_config( <p> </p>
+st.set_page_config( 
     page_title="Traffic Sign Recognition",
     page_icon="🚦",
     layout="wide"
@@ -25,6 +25,7 @@ body {
     color: #ffffff !important;
     text-align: center;
     text-shadow: 0px 0px 12px rgba(255,255,255,0.35);
+    margin-top: 25px;
     margin-bottom: 5px;
 }
 .subtitle {
@@ -161,4 +162,5 @@ st.markdown(
     "<center>🔬 Powered by <b>TensorFlow</b> + <b>Streamlit</b> 🚀 | ",
     unsafe_allow_html=True
 )
+
 
