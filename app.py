@@ -121,6 +121,7 @@ else:
 # FOOTER
 st.write("---")
 st.markdown(
-    "<center>🔬 Powered by <b>TensorFlow</b> + <b>Streamlit</b> 🚀 | Developed by Atharv 👨‍💻</center>",
+    "<center>🔬 Powered by <b>TensorFlow</b> + <b>Streamlit</b> 🚀 | </center>",
     unsafe_allow_html=True
 )
+
