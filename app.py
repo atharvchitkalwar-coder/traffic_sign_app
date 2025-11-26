@@ -3,14 +3,14 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 
-# Page configuration
+# ───────────────────────────────────────── UI INITIAL SETUP ───────────────────────────────────────── #
 st.set_page_config(
     page_title="Traffic Sign Recognition",
     page_icon="🚦",
     layout="wide"
 )
 
-# Custom CSS for better UI
+# Custom CSS Styling
 st.markdown("""
 <style>
 body {
@@ -22,28 +22,35 @@ body {
 .title {
     font-size: 3rem;
     font-weight: 900;
-    color: #ffffff;
+    color: #ffffff !important;
     text-align: center;
+    text-shadow: 0px 0px 12px rgba(255,255,255,0.35);
+    margin-bottom: 5px;
 }
 .subtitle {
     font-size: 1.2rem;
-    color: #cccccc;
+    color: #c9c9c9 !important;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 35px;
 }
 .result-box {
+    background: #1f2937;
     padding: 20px;
-    background-color: #161b22;
-    color: white;
     border-radius: 12px;
-    margin-top: 20px;
     text-align: center;
-    border: 2px solid #30363d;
+    border-left: 5px solid #00c853;
+}
+.upload-note {
+    background: #3b3f04;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    color: #e5e5e5;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# Load Model with caching
+# ───────────────────────────────────────── LOAD MODEL ───────────────────────────────────────── #
 @st.cache_resource
 def load_model():
     model = tf.keras.models.load_model("model.h5")
@@ -51,9 +58,9 @@ def load_model():
 
 model = load_model()
 
-# Class Labels
+# Class Names
 class_names = {
-    0: 'Speed limit (20km/h)', 
+      0: 'Speed limit (20km/h)', 
     1: 'Speed limit (30km/h)', 
     2: 'Speed limit (50km/h)',
     3: 'Speed limit (60km/h)', 
@@ -98,63 +105,59 @@ class_names = {
     42: 'End of no passing for vehicles >3.5 metric tons'
 }
 
-# Sidebar Information
+# ───────────────────────────────────────── SIDEBAR ───────────────────────────────────────── #
 st.sidebar.title("⚙️ Model Details")
-st.sidebar.write("""
-**CNN Model**
-- Dataset: German Traffic Signs  
-- Input Size: 32×32  
-- Classes: 43  
+st.sidebar.markdown("#### CNN Model for Traffic Sign Classification")
+st.sidebar.markdown("""
+- 📁 Dataset: German Traffic Signs  
+- 🧠 Classes: **43**  
+- 🔹 Input: **32×32 RGB**  
+- 🧮 Normalization applied  
 """)
-st.sidebar.info("Upload a traffic sign & get real-time classification.")
+st.sidebar.info("Upload a traffic sign image to classify it!")
 
-# Main Title
-st.markdown('<p class="title">🚦 Traffic Sign Recognition</p>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Using Deep Learning for Intelligent Road Safety</p>', unsafe_allow_html=True)
+# ───────────────────────────────────────── MAIN TITLE ───────────────────────────────────────── #
+st.markdown('<p class="title">🚦 Traffic Sign Recognition System</p>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">AI-powered real-time road sign classification</p>', unsafe_allow_html=True)
 
-# File Upload Section
 uploaded_file = st.file_uploader("📌 Upload Traffic Sign Image", type=["jpg", "jpeg", "png"])
 
-if uploaded_file is not None:
+# ───────────────────────────────────────── PREDICTION HANDLING ───────────────────────────────────────── #
+if uploaded_file:
+    
     image = Image.open(uploaded_file)
+    st.image(image, caption="📷 Uploaded Image", width=350)
 
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        st.image(image, caption="Uploaded Image", use_column_width=True)
+    with st.spinner("🔍 Analyzing image..."):
+        img = image.resize((32, 32)).convert("RGB")
+        img = np.array(img) / 255.0
+        img = np.expand_dims(img, axis=0)
 
-    with col2:
-        with st.spinner("🔍 Analyzing Image..."):
-            # Preprocess
-            img = image.resize((32, 32))
-            img = img.convert("RGB")
-            img = np.array(img) / 255.0
-            img = np.expand_dims(img, axis=0)
+        predictions = model.predict(img)
+        top_5_idx = predictions[0].argsort()[-5:][::-1]
 
-            # Predict
-            predictions = model.predict(img)
-            class_index = np.argmax(predictions)
-            confidence = np.max(predictions) * 100
+        # Display Result
+        main_pred = top_5_idx[0]
+        confidence = predictions[0][main_pred]
 
-        # Show Results
-        st.markdown(f"""
-        <div class="result-box">
-            <h3>Prediction: {class_names[class_index]}</h3>
-            <h4>Confidence: {confidence:.2f}%</h4>
-        </div>
-        """, unsafe_allow_html=True)
+    st.markdown(
+        f"<div class='result-box'><h4>Prediction: {class_names[main_pred]}</h4>"
+        f"<p>Model Confidence: <b>{confidence*100:.2f}%</b></p></div>",
+        unsafe_allow_html=True
+    )
 
-        # Confidence Chart
-        st.write("📊 Class Probability Distribution")
-        st.bar_chart(predictions[0])
+    # Display chart for top-5
+    top5_labels = [class_names[i] for i in top_5_idx]
+    top5_scores = [float(predictions[0][i]) for i in top_5_idx]
+    st.bar_chart({"Confidence": top5_scores}, x=top5_labels)
+
 else:
-    st.warning("⬆️ Upload an image to begin classification")
+    st.markdown('<p class="upload-note">⬆ Upload an image to begin classification</p>',
+                unsafe_allow_html=True)
 
-# Footer
-st.markdown("""
-<hr>
-<div style='text-align:center; color: #777;'>
-
-Using TensorFlow + Streamlit 🚀
-</div>
-""", unsafe_allow_html=True)
-
+# ───────────────────────────────────────── FOOTER ───────────────────────────────────────── #
+st.write("---")
+st.markdown(
+    "<center>🔬 Powered by <b>TensorFlow</b> + <b>Streamlit</b> 🚀 | Developed by Atharv 👨‍💻</center>",
+    unsafe_allow_html=True
+)
